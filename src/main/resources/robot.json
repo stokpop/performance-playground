@@ -1,0 +1,1 @@
+{"name":"Robby","head":{"name":"head","eyes":[{"name":"left","type":"Camera"},{"name":"right","type":"Zoom"}]},"arms":[{"name":"arm1","type":"Static","length":100},{"name":"arm2","type":"Telescopic","length":390}],"legs":[{"name":"leg1","type":"Human"},{"name":"leg2","type":"Spider"}]}

@@ -1,0 +1,66 @@
+RULE Start test
+CLASS nl.stokpop.hazelcast.HazelcastCacheTest
+METHOD startTest()
+AT EXIT
+IF TRUE
+DO
+  traceOpen("my-log", "/tmp/my-trace.log");
+  traceln("my-log", "*** " + java.time.LocalDateTime.now() + " HazelcastCacheTest.startTest() " + $0);
+  traceClose("my-log");
+#DO traceln("*** " + java.time.LocalDateTime.now() + " HazelcastCacheTest.startTest() " + $0)
+ENDRULE
+
+RULE Hazelcast getMap
+CLASS com.hazelcast.core.HazelcastInstance
+METHOD com.hazelcast.map.IMap getMap(java.lang.String)
+AT EXIT
+IF TRUE
+DO traceln("*** " + java.time.LocalDateTime.now() + " HazelcastInstance.getMap " + $0)
+ENDRULE
+
+#RULE Hazelcast Map put
+#INTERFACE ^java.util.Map
+#METHOD put(java.lang.Object,java.lang.Object)
+#AT EXIT
+#IF TRUE
+#DO traceln("*** Map.put " + $0)
+#ENDRULE
+
+RULE Hazelcast IMap put entry
+INTERFACE ^com.hazelcast.core.IMap
+METHOD put(java.lang.Object,java.lang.Object)
+AT ENTRY
+BIND thread = Thread.currentThread();
+startTime = System.nanoTime()
+IF true
+DO link("put.com.hazelcast.map.IMap", thread, startTime)
+ENDRULE
+
+RULE Hazelcast IMap put exit
+INTERFACE ^com.hazelcast.core.IMap
+METHOD put(java.lang.Object,java.lang.Object)
+AT EXIT
+BIND thread = Thread.currentThread();
+startTime:int = unlink("put.com.hazelcast.map.IMap", thread);
+endTime = System.nanoTime()
+IF true
+DO
+  traceln([BYTEMAN] " + java.time.LocalDateTime.now() + " com.hazelcast.map.IMap.put() elapsedTime = " + (endTime - startTime));
+ENDRULE
+
+
+#RULE Hazelcast IMap put exit
+#INTERFACE ^com.hazelcast.core.IMap
+#METHOD put(java.lang.Object,java.lang.Object)
+#AT EXIT
+#BIND thread = Thread.currentThread();
+#startTime:int = unlink("put.com.hazelcast.map.IMap", thread);
+#endTime = System.nanoTime()
+#IF true
+#DO
+#  traceOpen("log", "/tmp/hazelcast.log");
+#  traceln("log", "[BYTEMAN] " + java.time.LocalDateTime.now() + " com.hazelcast.map.IMap.put() elapsedTime = " + (endTime - startTime));
+#  traceClose("log");
+#ENDRULE
+
+

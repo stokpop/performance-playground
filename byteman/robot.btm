@@ -1,0 +1,154 @@
+RULE trace main entry
+CLASS RobotWorld
+METHOD main
+AT ENTRY
+IF true
+DO traceln("entering main")
+ENDRULE
+
+RULE trace main exit
+CLASS RobotWorld
+METHOD main
+AT EXIT
+IF true
+DO traceln("exiting main: robots created: " + readCounter("robot creates"));
+traceln("strings created: " + readCounter("string creates"))
+ENDRULE
+
+# this rule counts Robot creates
+RULE count robot creates
+CLASS nl.stokpop.robot.domain.Robot
+METHOD <init>
+AT EXIT
+IF TRUE
+DO traceln("create robot " + $0.getName());
+incrementCounter("robot creates")
+ENDRULE
+
+RULE count string create (char[])
+CLASS java.lang.String
+METHOD <init>(char[])
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[])
+CLASS java.lang.String
+METHOD <init>(byte[])
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (char[],int,int)
+CLASS java.lang.String
+METHOD <init>(char[],int,int)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (int[],int,int)
+CLASS java.lang.String
+METHOD <init>(int[],int,int)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],int,int,int)
+CLASS java.lang.String
+METHOD <init>(byte[],int,int,int)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],int)
+CLASS java.lang.String
+METHOD <init>(byte[],int)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],int,int,String)
+CLASS java.lang.String
+METHOD <init>(byte[],int,int,String)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],int,int,Charset)
+CLASS java.lang.String
+METHOD <init>(byte[],int,int,Charset)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],String)
+CLASS java.lang.String
+METHOD <init>(byte[],String)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],Charset)
+CLASS java.lang.String
+METHOD <init>(byte[],Charset)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (byte[],int,int)
+CLASS java.lang.String
+METHOD <init>(byte[],int,int)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (StringBuffer)
+CLASS java.lang.String
+METHOD <init>(StringBuffer)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (StringBuilder)
+CLASS java.lang.String
+METHOD <init>(StringBuilder)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+RULE count string create (char[],boolean)
+CLASS java.lang.StringBuilder
+METHOD <init>(char[],boolean)
+AT EXIT
+IF NOT callerEquals("<init>") 
+DO traceln("create string " + $0);
+incrementCounter("string creates")
+ENDRULE
+
+

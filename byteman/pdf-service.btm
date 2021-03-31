@@ -1,0 +1,41 @@
+RULE MakePdfService addHelloWorldPage entry
+CLASS nl.stokpop.server.MakePdfService
+METHOD addHelloWorldPage(org.apache.pdfbox.pdmodel.PDDocument)
+AT ENTRY
+BIND thread = Thread.currentThread();
+startTime = System.nanoTime()
+IF true
+DO link("addHelloWorldPage.nl.stokpop.server.MakePdfService", thread, startTime)
+ENDRULE
+
+RULE MakePdfService addHelloWorldPage exit
+CLASS nl.stokpop.server.MakePdfService
+METHOD addHelloWorldPage(org.apache.pdfbox.pdmodel.PDDocument)
+AT EXIT
+BIND thread = Thread.currentThread();
+startTime:int = unlink("addHelloWorldPage.nl.stokpop.server.MakePdfService", thread);
+endTime = System.nanoTime()
+IF true
+DO traceln("[BYTEMAN] [" + thread.getName() + "] MakePdfService.addHelloWorldPage() elapsedTimeNanos = " + (endTime - startTime))
+ENDRULE
+
+RULE MakePdfService createHelloWorldPdf entry
+CLASS nl.stokpop.server.MakePdfService
+METHOD createHelloWorldPdf(org.apache.pdfbox.pdmodel.PDDocument)
+AT ENTRY
+BIND thread = Thread.currentThread();
+startTime = System.nanoTime()
+IF true
+DO link("createHelloWorldPdf.nl.stokpop.server.MakePdfService", thread, startTime)
+ENDRULE
+
+RULE MakePdfService createHelloWorldPdf exit
+CLASS nl.stokpop.server.MakePdfService
+METHOD createHelloWorldPdf(org.apache.pdfbox.pdmodel.PDDocument)
+AT EXIT
+BIND thread = Thread.currentThread();
+startTime:int = unlink("createHelloWorldPdf.nl.stokpop.server.MakePdfService", thread);
+endTime = System.nanoTime()
+IF true
+DO traceln("[BYTEMAN] [" + thread.getName() + "] MakePdfService.createHelloWorldPdf() elapsedTimeNanos = " + (endTime - startTime))
+ENDRULE
