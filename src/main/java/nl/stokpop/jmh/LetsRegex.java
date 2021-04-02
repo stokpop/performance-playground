@@ -21,10 +21,13 @@ public class LetsRegex {
     public String A = "a";
     public String B = "b";
 
+    public static String ONE_CHAR_COMPLEX_REGEXP = "(a+)";
+
     private static final String TWO_OR_MORE_SLASHES_REGEXP = "//+";
     private static final Pattern SLASH_PATTERN = Pattern.compile(TWO_OR_MORE_SLASHES_REGEXP);
     private static final Pattern SLASH_LAST_PATTERN = Pattern.compile("/$");
     private static final Pattern ONE_CHAR_PATTERN = Pattern.compile("a");
+    private static final Pattern ONE_CHAR_COMPLEX_PATTERN = Pattern.compile(ONE_CHAR_COMPLEX_REGEXP);
 
     @Benchmark
     public void stringReplaceChar(Blackhole blackhole) {
@@ -44,6 +47,16 @@ public class LetsRegex {
     @Benchmark
     public void stringReplaceAllSingleCharOnePattern(Blackhole blackhole)  {
         blackhole.consume(ONE_CHAR_PATTERN.matcher(text).replaceAll(B));
+    }
+
+    @Benchmark
+    public void stringReplaceAllSingleCharOneComplexPattern(Blackhole blackhole)  {
+        blackhole.consume(ONE_CHAR_COMPLEX_PATTERN.matcher(text).replaceAll(B));
+    }
+
+    @Benchmark
+    public void stringReplaceAllSingleCharComplexPattern(Blackhole blackhole)  {
+        blackhole.consume(text.replaceAll(ONE_CHAR_COMPLEX_REGEXP, B));
     }
 
     @Benchmark
@@ -113,8 +126,8 @@ public class LetsRegex {
                 .warmupIterations(2)
                 .measurementIterations(4)
                 .verbosity(VerboseMode.EXTRA)
-                //.include("Replace")
-                .include("Single")
+                .include("Replace")
+                //.include("ComplexPattern")
                 .build();
 
         new Runner(options).run();
