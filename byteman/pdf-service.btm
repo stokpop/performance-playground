@@ -13,7 +13,7 @@ CLASS nl.stokpop.server.MakePdfService
 METHOD addHelloWorldPage(org.apache.pdfbox.pdmodel.PDDocument)
 AT EXIT
 BIND thread = Thread.currentThread();
-startTime:int = unlink("addHelloWorldPage.nl.stokpop.server.MakePdfService", thread);
+startTime:long = unlink("addHelloWorldPage.nl.stokpop.server.MakePdfService", thread);
 endTime = System.nanoTime()
 IF true
 DO traceln("[BYTEMAN] [" + thread.getName() + "] MakePdfService.addHelloWorldPage() elapsedTimeNanos = " + (endTime - startTime))
@@ -34,7 +34,7 @@ CLASS nl.stokpop.server.MakePdfService
 METHOD createHelloWorldPdf(org.apache.pdfbox.pdmodel.PDDocument)
 AT EXIT
 BIND thread = Thread.currentThread();
-startTime:int = unlink("createHelloWorldPdf.nl.stokpop.server.MakePdfService", thread);
+startTime:long = unlink("createHelloWorldPdf.nl.stokpop.server.MakePdfService", thread);
 endTime = System.nanoTime()
 IF true
 DO traceln("[BYTEMAN] [" + thread.getName() + "] MakePdfService.createHelloWorldPdf() elapsedTimeNanos = " + (endTime - startTime))

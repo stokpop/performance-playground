@@ -41,7 +41,7 @@ INTERFACE ^com.hazelcast.core.IMap
 METHOD put(java.lang.Object,java.lang.Object)
 AT EXIT
 BIND thread = Thread.currentThread();
-startTime:int = unlink("put.com.hazelcast.map.IMap", thread);
+startTime:long = unlink("put.com.hazelcast.map.IMap", thread);
 endTime = System.nanoTime()
 IF true
 DO
@@ -54,7 +54,7 @@ ENDRULE
 #METHOD put(java.lang.Object,java.lang.Object)
 #AT EXIT
 #BIND thread = Thread.currentThread();
-#startTime:int = unlink("put.com.hazelcast.map.IMap", thread);
+#startTime:long = unlink("put.com.hazelcast.map.IMap", thread);
 #endTime = System.nanoTime()
 #IF true
 #DO

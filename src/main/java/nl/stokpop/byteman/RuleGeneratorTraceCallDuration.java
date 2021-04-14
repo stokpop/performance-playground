@@ -24,7 +24,7 @@ public class RuleGeneratorTraceCallDuration {
         "METHOD @methodSignature@\n" +
         "AT EXIT\n" +
         "BIND thread = Thread.currentThread();\n" +
-        "startTime:int = unlink(\"@methodName@.@classSignature@\", thread);\n" +
+        "startTime:long = unlink(\"@methodName@.@classSignature@\", thread);\n" +
         "endTime = System.nanoTime()\n" +
         "IF true\n" +
         "DO traceln(\"[BYTEMAN] [\" + thread.getName() + \"] @className@.@methodName@() elapsedTimeNanos = \" + (endTime - startTime))\n" +
