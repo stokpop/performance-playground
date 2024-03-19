@@ -18,7 +18,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @EnableAsync
 public class Futures {
 
-    private FutureService futureService;
+    private final FutureService futureService;
 
     public Futures(FutureService futureService) {
         this.futureService = futureService;
@@ -39,6 +39,10 @@ public class Futures {
                 futureService.calculateAmounts("USA"),
                 List.of(new Amount("-1 USD")));
 
+        CompletableFuture<List<Amount>> amountsFuture3 = decorateCompletableFuture(
+                futureService.calculateAmounts("United Kingdom"),
+                List.of(new Amount("0 GBP")));
+
         log.info("Main thread is doing something else.");
 
         log.info("Waiting for all amounts to be calculated.");
@@ -46,6 +50,7 @@ public class Futures {
         List<Amount> combinedAmounts = new ArrayList<>(amountsFuture1.join());
         log.info("Waiting for second amounts to be calculated.");
         combinedAmounts.addAll(amountsFuture2.join());
+        combinedAmounts.addAll(amountsFuture3.join());
 
         log.info("Combined amounts are: {}", combinedAmounts);
 
@@ -58,6 +63,12 @@ public class Futures {
                 .exceptionally(throwable -> {
                     String simpleName = throwable.getClass().getSimpleName();
                     String message = throwable.getMessage();
+//                    try {
+//                        Thread.sleep(10_000);
+//                    } catch (InterruptedException e) {
+//                        Thread.currentThread().interrupt();
+//                        throw new WatskeburtException("Interrupted!" + e.getMessage());
+//                    }
                     log.error("Exception occurred {}: {}",
                             simpleName,
                             message == null ? "<no message>" : message);

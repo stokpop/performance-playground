@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class FutureService {
     private static final Map<String, String> CURRENCIES =
-            Map.of("netherlands", "EUR", "usa", "USD");
+            Map.of("netherlands", "EUR", "usa", "USD", "united kingdom", "GBP");
 
     @Async
     public CompletableFuture<List<Amount>> calculateAmounts(String country) {
