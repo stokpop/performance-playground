@@ -1,5 +1,6 @@
 package nl.stokpop.httpclient;
 
+import nl.stokpop.kotlin.httpclient.HttpClientDefaultConfig;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CredentialsProvider;
@@ -35,6 +36,10 @@ public class HttpClientExtravaganza {
 
         }
     };
+
+    public void fake() {
+        boolean check = new HttpClientDefaultConfig().createHttpClient() == null;
+    }
 
     public CloseableHttpClient createHttpClientOne() {
         RequestConfig requestConfig = RequestConfig.custom()
