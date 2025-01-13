@@ -2,7 +2,9 @@ package nl.stokpop.streams;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,8 +15,9 @@ public class StringToJson {
 
     public static String createJson(Set<String> parameters) {
         return parameters.stream()
-            .map(StringToJson::parameterSnippit)
-            .collect(Collectors.joining(",", "{", "}"));
+                .sorted()
+                .map(StringToJson::parameterSnippit)
+                .collect(Collectors.joining(",", "{", "}"));
     }
 
     private static class JsonParameters {
@@ -30,25 +33,23 @@ public class StringToJson {
     }
 
     private static String parameterSnippit(String par) {
-        return String.format("\"%s\": \"${%s}\"", par, par);
+        return String.format("\"%s\":\"${%s}\"", par, par);
     }
 
     public static String createJsonOld(Set<String> parameters) {
-        String jsonBody = "{\n";
-        Integer index = 0;
-        Integer numberOfParameters = parameters.size() - 1;
-        for (String parameter : parameters) {
+        List<String> parametersSorted = parameters.stream().sorted().toList();
+        String jsonBody = "{";
+        int index = 0;
+        int numberOfParameters = parameters.size() - 1;
+        for (String parameter : parametersSorted) {
+            jsonBody = jsonBody + "\"" + parameter + "\":\"${" + parameter + "}\"";
             if(index != numberOfParameters ){
-                jsonBody = jsonBody + "\t\"" + parameter + "\": ${" + parameter + "},\n";
-            } else {
-                jsonBody = jsonBody + "\t\"" + parameter + "\": ${" + parameter + "}\n";
+                jsonBody = jsonBody + ",";
             }
             index++;
         }
 
         return jsonBody + "}";
     }
-
-
 
 }

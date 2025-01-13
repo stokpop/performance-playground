@@ -21,6 +21,7 @@ class MakeDefensiveCopyTest {
         Date date = new Date(2020, 9, 26);
         assertFalse(defensiveCopy.isDatePresent(date));
         dates.add(date);
+        // the next one fails if MakeDefensiveCopy does not make an explicit defensive copy
         assertFalse(defensiveCopy.isDatePresent(date));
     }
 }

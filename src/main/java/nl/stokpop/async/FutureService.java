@@ -1,8 +1,8 @@
 package nl.stokpop.async;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.stokpop.WatskeburtException;
 import nl.stokpop.money.Amount;
-import org.apache.commons.logging.impl.WeakHashtable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 

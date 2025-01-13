@@ -1,6 +1,7 @@
 package nl.stokpop.money;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Money {
@@ -8,7 +9,8 @@ public class Money {
     public static void main(String[] args) {
         BigDecimal bigDecimal = new BigDecimal(0.105);
         System.out.println("value = " + bigDecimal);
-        System.out.println("result = " + bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP));
+        System.out.println("result double constructor RoundingMode.HALF_UP = " + bigDecimal.setScale(2, RoundingMode.HALF_UP));
+        System.out.println("result valueOf            RoundingMode.HALF_UP = " + BigDecimal.valueOf(0.105).setScale(2, RoundingMode.HALF_UP));
 
         Set<Amount> set = new HashSet<>();
         set.add(new Amount("0.10"));

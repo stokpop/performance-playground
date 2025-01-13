@@ -16,6 +16,7 @@ class StringToJsonTest {
         String json2 = StringToJson.createJsonOld(params);
         assertEquals(json, json2);
     }
+
     @Test
     void createJsonJackson() throws JsonProcessingException {
         Set<String> params = Set.of("text", "123", "bla", "foo");

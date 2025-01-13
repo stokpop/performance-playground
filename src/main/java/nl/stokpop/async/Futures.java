@@ -1,6 +1,7 @@
 package nl.stokpop.async;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.stokpop.WatskeburtException;
 import nl.stokpop.money.Amount;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -63,17 +64,21 @@ public class Futures {
                 .exceptionally(throwable -> {
                     String simpleName = throwable.getClass().getSimpleName();
                     String message = throwable.getMessage();
-//                    try {
-//                        Thread.sleep(10_000);
-//                    } catch (InterruptedException e) {
-//                        Thread.currentThread().interrupt();
-//                        throw new WatskeburtException("Interrupted!" + e.getMessage());
-//                    }
+                    sleepInMillis(1_000);
                     log.error("Exception occurred {}: {}",
                             simpleName,
                             message == null ? "<no message>" : message);
                     return defaults;
                 });
+    }
+
+    private static void sleepInMillis(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new WatskeburtException("Interrupted!" + e.getMessage());
+        }
     }
 
 }

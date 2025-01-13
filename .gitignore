@@ -4,3 +4,4 @@ target/
 *.iml
 *.log
 *.jfr
+src/main/java/nl/stokpop/Foo.java
