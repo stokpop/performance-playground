@@ -35,7 +35,7 @@ public class CheckNettyClient {
         HttpClient client = HttpClient.create(provider)
                 .secure(CheckNettyClient::configureSslProvider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .responseTimeout(Duration.ofSeconds(5))
+                .responseTimeout(Duration.ofSeconds(4))
                 .wiretap(true); // log requests and responses
 
         client.warmup().block();
@@ -47,13 +47,13 @@ public class CheckNettyClient {
                 executor.submit(() -> {
                     final long startTimeMillis = System.currentTimeMillis();
                     client.get()
-                            .uri("https://httpbin.org/delay/1")
+                            .uri("https://httpbin.org/delay/4")
                             //.uri("https://10.255.255.1/delay/6") // force connection timeout
                             .responseContent()
                             .aggregate()
                             .asString()
                             .doOnNext(CheckNettyClient::reportResponse)
-                            .doOnError(CheckNettyClient::reportError)
+                            .doOnError(throwable -> reportError(throwable, System.currentTimeMillis() - startTimeMillis))
                             .block();
                     System.out.println(Thread.currentThread().getName() + " total time to response: " + (System.currentTimeMillis() - startTimeMillis) + " ms");
                 });
@@ -80,8 +80,8 @@ public class CheckNettyClient {
         }
     }
 
-    private static void reportError(Throwable throwable) {
-        System.err.println("Error handler: " + throwable);
+    private static void reportError(Throwable throwable, long durationMillis) {
+        System.err.println("Error handler (after " + durationMillis + " ms): " + throwable);
         throwable.printStackTrace();
     }
 }
