@@ -47,20 +47,6 @@
                             <jvmTarget>17</jvmTarget> <!-- Ensure alignment with Java version -->
                         </configuration>
                     </execution>
-<!--                    <execution>-->
-<!--                        <id>compile</id>-->
-<!--                        <phase>compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>compile</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <sourceDirs>-->
-<!--                                <source>src/main/java</source>-->
-<!--                                <source>target/generated-sources/annotations</source>-->
-<!--                                <source>src/main/kotlin</source>-->
-<!--                            </sourceDirs>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
                     <execution>
                         <id>test-compile</id>
                         <phase>test-compile</phase>
@@ -229,20 +215,18 @@
             <version>4.1.5</version>
         </dependency>
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <version>3.4.14</version>
-        </dependency>
-        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-aarch_64</classifier> <!-- Or x86_64 if your macOS is Intel-based -->
         </dependency>
     </dependencies>
 </project>
