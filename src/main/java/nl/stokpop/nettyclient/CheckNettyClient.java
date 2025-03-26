@@ -22,8 +22,8 @@ public class CheckNettyClient {
     private void createNettyClient() {
         ConnectionProvider provider =
                 ConnectionProvider.builder("custom")
-                        .maxConnections(1) // when omitted defaults to 2 x number of available processors, e.g. 20 on mac m1 laptop
-                        .pendingAcquireMaxCount(1) // reduce for fail fast behavior
+                        .maxConnections(10) // when omitted defaults to 2 x number of available processors, e.g. 20 on mac m1 laptop
+                        .pendingAcquireMaxCount(10) // reduce for fail fast behavior
                         .pendingAcquireTimeout(Duration.ofSeconds(4)) // reduce for fail fast behavior
                         .lifo() // recommended over fifo for most cases
                         .maxIdleTime(Duration.ofSeconds(20)) // not sure what is recommended here
@@ -31,47 +31,74 @@ public class CheckNettyClient {
                         .evictInBackground(Duration.ofSeconds(120)) // not sure what is recommended here
                         .build();
 
-
         HttpClient client = HttpClient.create(provider)
                 .secure(CheckNettyClient::configureSslProvider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .responseTimeout(Duration.ofSeconds(4))
-                .wiretap(true); // log requests and responses
+                .responseTimeout(Duration.ofSeconds(5))
+                .wiretap(false) // log requests and responses
+                .doOnChannelInit((connectionObserver, channel, remoteAddress) -> {
+                            channel.pipeline().addAfter("reactor.left.httpCodec","delay", new DelayedMessageHandler(1000));
+                            channel.pipeline().forEach(p -> System.out.println("PIPELINE: " + p));
+                        }
+                );
+
+        EnvironmentListener environmentListener = new EnvironmentListener().start();
 
         client.warmup().block();
 
-        int parallelCalls = 4;
-        ExecutorService executor = Executors.newFixedThreadPool(parallelCalls);
+        int parallelCalls = 1;
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        int countDown = 2;
         try {
-            for (int i = 0; i < parallelCalls; i++) {
-                executor.submit(() -> {
-                    final long startTimeMillis = System.currentTimeMillis();
-                    client.get()
-                            .uri("https://httpbin.org/delay/4")
-                            //.uri("https://10.255.255.1/delay/6") // force connection timeout
-                            .responseContent()
-                            .aggregate()
-                            .asString()
-                            .doOnNext(CheckNettyClient::reportResponse)
-                            .doOnError(throwable -> reportError(throwable, System.currentTimeMillis() - startTimeMillis))
-                            .block();
-                    System.out.println(Thread.currentThread().getName() + " total time to response: " + (System.currentTimeMillis() - startTimeMillis) + " ms");
-                });
+            while (countDown-- > 0) {
+                for (int i = 0; i < parallelCalls; i++) {
+                    executor.submit(getRunnableForCall(client));
+                }
+                int sleepMillis = 15_000;
+                sleep(sleepMillis);
             }
         } finally {
             executor.shutdown();
+            environmentListener.stop();
         }
     }
 
+    private static void sleep(int sleepMillis) {
+        try {
+            Thread.sleep(sleepMillis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NotNull
+    private static Runnable getRunnableForCall(HttpClient client) {
+        return () -> {
+            final long startTimeMillis = System.currentTimeMillis();
+            client.get()
+                    .uri("https://www.google.com")
+                    //.uri("https://httpbin.org/delay/4")
+                    //.uri("https://10.255.255.1/delay/6") // force connection timeout
+                    .responseContent()
+                    .aggregate()
+                    .asString()
+                    .doOnNext(CheckNettyClient::reportResponse)
+                    .doOnError(throwable -> reportError(throwable, System.currentTimeMillis() - startTimeMillis))
+                    .block();
+            log(Thread.currentThread().getName() + " total time to response: " + (System.currentTimeMillis() - startTimeMillis) + " ms");
+        };
+    }
+
     private static void reportResponse(String response) {
-        System.out.println("Response: " + response);
+        log("Response: " + response);
     }
 
     @NotNull
     private static SslProvider configureSslProvider(SslProvider.SslContextSpec spec) {
         try {
             return spec.sslContext(SslContextBuilder.forClient().build())
-                    .handshakeTimeout(Duration.ofMillis(800)) // default 10 seconds
+                    .handshakeTimeout(Duration.ofMillis(1800)) // default 10 seconds
                     .closeNotifyFlushTimeout(Duration.ofSeconds(2)) // default 3 seconds
                     .closeNotifyReadTimeout(Duration.ofSeconds(2)) // default 0 (disabled)
                     .build();
@@ -81,7 +108,11 @@ public class CheckNettyClient {
     }
 
     private static void reportError(Throwable throwable, long durationMillis) {
-        System.err.println("Error handler (after " + durationMillis + " ms): " + throwable);
+        log("Error handler (after " + durationMillis + " ms): " + throwable);
         throwable.printStackTrace();
+    }
+
+    private static void log(String msg) {
+        System.out.println(msg);
     }
 }
