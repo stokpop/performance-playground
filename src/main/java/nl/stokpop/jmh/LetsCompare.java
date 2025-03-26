@@ -14,39 +14,60 @@ import java.util.*;
 @BenchmarkMode(Mode.Throughput)
 public class LetsCompare {
 
-    List<PersonPerCallCompare> personsPerCall = createPersonsPerCallList();
-    List<PersonPerObjectCompare> personsPerObject = createPersonsPerObjectList();
+    public static final Comparator<Person> COMPARE_AGE_LAST_FIRST = Comparator
+            .comparingInt(Person::getAge)
+            .thenComparing(Person::getLastName)
+            .thenComparing(Person::getFirstName);
 
-    private List<PersonPerCallCompare> createPersonsPerCallList() {
-        List<PersonPerCallCompare> persons = new ArrayList<>();
-        persons.add(new PersonPerCallCompare("John", "Doe", 30));
-        persons.add(new PersonPerCallCompare("Jane", "Doe", 25));
-        persons.add(new PersonPerCallCompare("John", "Smith", 40));
-        persons.add(new PersonPerCallCompare("Jane", "Smith", 35));
+    List<PersonSameComparator> personsSameComparator = createPersonsSameComparator();
+    List<PersonComparatorPerCall> personsComparatorPerCall = createPersonsComparatorPerCall();
+
+    private List<PersonSameComparator> createPersonsSameComparator() {
+        List<PersonSameComparator> persons = new ArrayList<>();
+        persons.add(new PersonSameComparator("John", "Doe", 30));
+        persons.add(new PersonSameComparator("Jane", "Doe", 25));
+        persons.add(new PersonSameComparator("John", "Smith", 40));
+        persons.add(new PersonSameComparator("Jane", "Smith", 35));
         return persons;
     }
 
-    private List<PersonPerObjectCompare> createPersonsPerObjectList() {
-        List<PersonPerObjectCompare> persons = new ArrayList<>();
-        persons.add(new PersonPerObjectCompare("John", "Doe", 30));
-        persons.add(new PersonPerObjectCompare("Jane", "Doe", 25));
-        persons.add(new PersonPerObjectCompare("John", "Smith", 40));
-        persons.add(new PersonPerObjectCompare("Jane", "Smith", 35));
+    private List<PersonComparatorPerCall> createPersonsComparatorPerCall() {
+        List<PersonComparatorPerCall> persons = new ArrayList<>();
+        persons.add(new PersonComparatorPerCall("John", "Doe", 30));
+        persons.add(new PersonComparatorPerCall("Jane", "Doe", 25));
+        persons.add(new PersonComparatorPerCall("John", "Smith", 40));
+        persons.add(new PersonComparatorPerCall("Jane", "Smith", 35));
         return persons;
     }
 
     @Benchmark
-    public void usePerObjectCompare(Blackhole blackhole) {
-        Collections.sort(personsPerObject);
-        Collections.reverse(personsPerObject);
-        blackhole.consume(personsPerObject);
+    public void useNewComparatorPerCall(Blackhole blackhole) {
+        Collections.sort(personsComparatorPerCall);
+        Collections.reverse(personsComparatorPerCall);
+        blackhole.consume(personsComparatorPerCall);
     }
 
     @Benchmark
-    public void usePerCallCompare(Blackhole blackhole) {
-        Collections.sort(personsPerCall);
-        Collections.reverse(personsPerCall);
-        blackhole.consume(personsPerCall);
+    public void useSameComparator(Blackhole blackhole) {
+        Collections.sort(personsSameComparator);
+        Collections.reverse(personsSameComparator);
+        blackhole.consume(personsSameComparator);
+    }
+
+    @Benchmark
+    public void useNewComparatorPerSort(Blackhole blackhole) {
+        // should not matter which collection is used, as we use an external comparator
+        Collections.sort(personsComparatorPerCall, Comparator.comparingInt(Person::getAge).thenComparing(Person::getLastName).thenComparing(Person::getFirstName));
+        Collections.reverse(personsComparatorPerCall);
+        blackhole.consume(personsComparatorPerCall);
+    }
+
+    @Benchmark
+    public void useSameComparatorForSort(Blackhole blackhole) {
+        // should not matter which collection is used, as we use an external comparator
+        Collections.sort(personsComparatorPerCall, COMPARE_AGE_LAST_FIRST);
+        Collections.reverse(personsComparatorPerCall);
+        blackhole.consume(personsComparatorPerCall);
     }
 
     private abstract class Person implements Comparable<Person> {
@@ -88,8 +109,8 @@ public class LetsCompare {
         }
     }
 
-    private class PersonPerObjectCompare extends Person {
-        public PersonPerObjectCompare(String firstName, String lastName, int age) {
+    private class PersonComparatorPerCall extends Person {
+        public PersonComparatorPerCall(String firstName, String lastName, int age) {
             super(firstName, lastName, age);
         }
 
@@ -102,18 +123,18 @@ public class LetsCompare {
         }
     }
 
-    private class PersonPerCallCompare extends Person {
-        private Comparator<Person> personComparator = Comparator.comparing(Person::getFirstName)
+    private class PersonSameComparator extends Person {
+        private static final Comparator<Person> PERSON_COMPARATOR = Comparator.comparing(Person::getFirstName)
                 .thenComparing(Person::getLastName)
                 .thenComparingInt(Person::getAge);
 
-        public PersonPerCallCompare(String firstName, String lastName, int age) {
+        public PersonSameComparator(String firstName, String lastName, int age) {
             super(firstName, lastName, age);
         }
 
         @Override
         public int compareTo(@NotNull Person o) {
-            return personComparator.compare(this, o);
+            return PERSON_COMPARATOR.compare(this, o);
         }
     }
 
@@ -124,7 +145,7 @@ public class LetsCompare {
                 .warmupIterations(2)
                 .measurementIterations(4)
                 .verbosity(VerboseMode.EXTRA)
-                .include("usePer")
+                .include("LetsCompare.use")
                 .build();
 
         new Runner(options).run();
