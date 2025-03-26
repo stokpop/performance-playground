@@ -1,5 +1,7 @@
 package nl.stokpop.jmh;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import nl.stokpop.robot.domain.Robot;
@@ -22,6 +24,11 @@ public class LetsParseJson {
 
     private static final ObjectReader robotReader = objectMapper.readerFor(Robot.class);
 
+    private static final ObjectMapper objectMapperLite = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    private static final ObjectReader robotNameOnlyReader = objectMapperLite.readerFor(RobotNameOnly.class);
+
     @Benchmark
     public void parseJsonNewObjectMapper(Blackhole blackhole) throws IOException {
         ObjectMapper localObjectMapper = new ObjectMapper();
@@ -35,7 +42,36 @@ public class LetsParseJson {
 
     @Benchmark
     public void parseJsonReuseObjectReader(Blackhole blackhole) throws IOException {
-        blackhole.consume(robotReader.readValue(robotJson));
+        Robot robot = robotReader.readValue(robotJson);
+        blackhole.consume(robot);
+    }
+
+    @Benchmark
+    public void parseJsonNameOnlyObject(Blackhole blackhole) throws IOException {
+        RobotNameOnly robotNameOnly = robotNameOnlyReader.readValue(robotJson);
+        blackhole.consume(robotNameOnly.getName());
+    }
+
+    @Benchmark
+    public void parseJsonNameOnlyTree(Blackhole blackhole) throws IOException {
+        JsonNode jsonNode = objectMapper.readTree(robotJson);
+        blackhole.consume(jsonNode.get("name").asText());
+    }
+
+
+    private static class RobotNameOnly {
+        private String name;
+
+        // Default constructor required by Jackson
+        public RobotNameOnly() {
+        }
+
+        public RobotNameOnly(String name) {
+            this.name = name;
+        }
+        public String getName() {
+            return name;
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -44,7 +80,7 @@ public class LetsParseJson {
                 .warmupIterations(4)
                 .measurementIterations(4)
                 .verbosity(VerboseMode.EXTRA)
-                .include("Json")
+                .include("parseJson")
                 .build();
 
         new Runner(options).run();
