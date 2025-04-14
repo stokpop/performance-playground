@@ -20,7 +20,7 @@ public class MakePdfService {
 
         // based on the cookbook: https://pdfbox.apache.org/1.8/cookbook/documentcreation.html
 
-        // Create a document and add a page to it and and ensure that the document is properly closed
+        // Create a document and add a page to it and ensure that the document is properly closed
         try (PDDocument document = new PDDocument()) {
             createHelloWorldPdf(document);
 
@@ -36,7 +36,7 @@ public class MakePdfService {
 
         // based on the cookbook: https://pdfbox.apache.org/1.8/cookbook/documentcreation.html
 
-        // Create a document and add a page to it and and ensure that the document is properly closed
+        // Create a document and add a page to it and ensure that the document is properly closed
         try (PDDocument document = new PDDocument()) {
             createHelloWorldPdf(document);
 
