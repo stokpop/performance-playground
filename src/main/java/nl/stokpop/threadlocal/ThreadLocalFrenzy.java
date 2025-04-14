@@ -1,5 +1,6 @@
 package nl.stokpop.threadlocal;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,6 +45,8 @@ public class ThreadLocalFrenzy {
         service.submit(createReadTLRunnable());
         service.submit(createReadTLRunnable());
 
+        waitForPressEnter();
+
         service.shutdown();
     }
 
@@ -71,6 +74,8 @@ public class ThreadLocalFrenzy {
         service.submit(createReadTLContextRunnable(c2));
         service.submit(createReadTLContextRunnable(c2));
 
+        waitForPressEnter();
+
         service.shutdown();
     }
 
@@ -83,6 +88,15 @@ public class ThreadLocalFrenzy {
 
     private static Runnable createReadTLRunnable() {
         return () -> print(threadName() + " reads " + UserContextStatic.getUser());
+    }
+
+    private static void waitForPressEnter() {
+        try {
+            System.out.println("Press Enter to continue...");
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
