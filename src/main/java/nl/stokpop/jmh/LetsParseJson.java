@@ -14,6 +14,17 @@ import org.openjdk.jmh.runner.options.VerboseMode;
 
 import java.io.IOException;
 
+
+// Benchmark                                  Mode  Cnt        Score        Error  Units
+//LetsParseGson.parseJsonNewGson            thrpt    4    61840,160 ±   1591,536  ops/s
+//LetsParseGson.parseJsonReuseGson          thrpt    4   662519,182 ±   9743,759  ops/s
+//LetsParseJson.parseJsonNameOnlyObject     thrpt    4  1342566,661 ± 159923,749  ops/s
+//LetsParseJson.parseJsonNameOnlyTree       thrpt    4   771198,281 ±   8476,414  ops/s
+//LetsParseJson.parseJsonNewObjectMapper    thrpt    4    31847,975 ±    461,379  ops/s
+//LetsParseJson.parseJsonReuseObjectMapper  thrpt    4   846913,636 ±  39902,903  ops/s
+//LetsParseJson.parseJsonReuseObjectReader  thrpt    4   872881,838 ±  42258,373  ops/s
+
+
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
 public class LetsParseJson {
