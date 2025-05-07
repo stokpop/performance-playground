@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Set specific logging levels -->
+    <logger name="reactor.util.Loggers" level="INFO"/>
+    <logger name="io.netty" level="INFO"/>
+    <logger name="reactor" level="INFO"/>
+    <logger name="org.wiremock" level="INFO"/>
+    <logger name="wiremock" level="INFO"/>
+    <logger name="com.github.tomakehurst.wiremock" level="INFO"/>
+    
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
