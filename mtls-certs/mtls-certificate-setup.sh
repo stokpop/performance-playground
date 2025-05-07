@@ -34,8 +34,8 @@ keytool -genkeypair \
   -alias ca \
   -keyalg RSA \
   -keysize 2048 \
-  -storetype JKS \
-  -keystore ca.jks \
+  -storetype PKCS12 \
+  -keystore ca.p12 \
   -storepass $PASSWORD \
   -validity $VALIDITY \
   -dname "CN=$CA_NAME,OU=$ORG_UNIT,O=$ORG,L=$LOCALITY,ST=$STATE,C=$COUNTRY" \
@@ -46,8 +46,9 @@ keytool -genkeypair \
 keytool -exportcert \
   -alias ca \
   -file ca.crt \
-  -keystore ca.jks \
-  -storepass $PASSWORD
+  -keystore ca.p12 \
+  -storepass $PASSWORD \
+  -storetype PKCS12
 
 section "Creating Server Certificate"
 # Generate server keypair
@@ -55,8 +56,8 @@ keytool -genkeypair \
   -alias server \
   -keyalg RSA \
   -keysize 2048 \
-  -storetype JKS \
-  -keystore server.jks \
+  -storetype PKCS12 \
+  -keystore server.p12 \
   -storepass $PASSWORD \
   -validity $VALIDITY \
   -dname "CN=$SERVER_NAME,OU=Server,O=$ORG,L=$LOCALITY,ST=$STATE,C=$COUNTRY"
@@ -64,14 +65,16 @@ keytool -genkeypair \
 # Create Certificate Signing Request (CSR)
 keytool -certreq \
   -alias server \
-  -keystore server.jks \
+  -keystore server.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -file server.csr
 
 # Sign the server certificate with the CA
 keytool -gencert \
   -alias ca \
-  -keystore ca.jks \
+  -keystore ca.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -infile server.csr \
   -outfile server.crt \
@@ -82,7 +85,8 @@ keytool -gencert \
 keytool -importcert \
   -alias ca \
   -file ca.crt \
-  -keystore server.jks \
+  -keystore server.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -noprompt
 
@@ -90,7 +94,8 @@ keytool -importcert \
 keytool -importcert \
   -alias server \
   -file server.crt \
-  -keystore server.jks \
+  -keystore server.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD
 
 section "Creating Client Certificate"
@@ -99,8 +104,8 @@ keytool -genkeypair \
   -alias client \
   -keyalg RSA \
   -keysize 2048 \
-  -storetype JKS \
-  -keystore client.jks \
+  -storetype PKCS12 \
+  -keystore client.p12 \
   -storepass $PASSWORD \
   -validity $VALIDITY \
   -dname "CN=$CLIENT_NAME,OU=Client,O=$ORG,L=$LOCALITY,ST=$STATE,C=$COUNTRY"
@@ -108,14 +113,16 @@ keytool -genkeypair \
 # Create Certificate Signing Request (CSR)
 keytool -certreq \
   -alias client \
-  -keystore client.jks \
+  -keystore client.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -file client.csr
 
 # Sign the client certificate with the CA
 keytool -gencert \
   -alias ca \
-  -keystore ca.jks \
+  -keystore ca.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -infile client.csr \
   -outfile client.crt \
@@ -126,7 +133,8 @@ keytool -gencert \
 keytool -importcert \
   -alias ca \
   -file ca.crt \
-  -keystore client.jks \
+  -keystore client.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -noprompt
 
@@ -134,7 +142,8 @@ keytool -importcert \
 keytool -importcert \
   -alias client \
   -file client.crt \
-  -keystore client.jks \
+  -keystore client.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD
 
 section "Creating Server Truststore"
@@ -142,8 +151,8 @@ section "Creating Server Truststore"
 keytool -importcert \
   -alias ca \
   -file ca.crt \
-  -keystore server-truststore.jks \
-  -storetype JKS \
+  -keystore server-truststore.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -noprompt
 
@@ -152,8 +161,8 @@ section "Creating Client Truststore"
 keytool -importcert \
   -alias ca \
   -file ca.crt \
-  -keystore client-truststore.jks \
-  -storetype JKS \
+  -keystore client-truststore.p12 \
+  -storetype PKCS12 \
   -storepass $PASSWORD \
   -noprompt
 
@@ -163,14 +172,14 @@ rm -f server.csr client.csr
 
 section "Certificate Generation Complete"
 echo "The following files have been created in $OUTPUT_DIR:"
-echo "- ca.jks: Certificate Authority keystore"
+echo "- ca.p12: Certificate Authority keystore"
 echo "- ca.crt: Certificate Authority public certificate"
-echo "- server.jks: Server keystore with private key and certificate"
+echo "- server.p12: Server keystore with private key and certificate"
 echo "- server.crt: Server public certificate"
-echo "- client.jks: Client keystore with private key and certificate"
+echo "- client.p12: Client keystore with private key and certificate"
 echo "- client.crt: Client public certificate"
-echo "- server-truststore.jks: Server truststore with CA certificate"
-echo "- client-truststore.jks: Client truststore with CA certificate"
+echo "- server-truststore.p12: Server truststore with CA certificate"
+echo "- client-truststore.p12: Client truststore with CA certificate"
 echo ""
 echo "Password for all keystores and truststores: $PASSWORD"
 echo ""

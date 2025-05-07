@@ -68,9 +68,9 @@ public class WebClientConfig {
         ClassLoader classLoader = WebClientExecutor.class.getClassLoader();
 
         // Load client keystore (for client authentication)
-        KeyStore keyStore = KeyStore.getInstance("JKS");
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
         char[] keyStorePassword = "changeit".toCharArray();
-        try (InputStream is = classLoader.getResourceAsStream("client.jks")) {
+        try (InputStream is = classLoader.getResourceAsStream("client.p12")) {
             keyStore.load(is, keyStorePassword);
         }
 
@@ -78,8 +78,8 @@ public class WebClientConfig {
         kmf.init(keyStore, keyStorePassword);
 
         // Load client truststore (to trust the server)
-        KeyStore trustStore = KeyStore.getInstance("JKS");
-        try (InputStream is = classLoader.getResourceAsStream("client-truststore.jks")) {
+        KeyStore trustStore = KeyStore.getInstance("PKCS12");
+        try (InputStream is = classLoader.getResourceAsStream("client-truststore.p12")) {
             trustStore.load(is, keyStorePassword);
         }
 

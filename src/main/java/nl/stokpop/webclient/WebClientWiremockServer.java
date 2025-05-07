@@ -40,8 +40,8 @@ public class WebClientWiremockServer {
 
         // Get path to resources through ClassLoader
         ClassLoader classLoader = WebClientWiremockServer.class.getClassLoader();
-        URL keystoreUrl = classLoader.getResource("server.jks");
-        URL truststoreUrl = classLoader.getResource("server-truststore.jks");
+        URL keystoreUrl = classLoader.getResource("server.p12");
+        URL truststoreUrl = classLoader.getResource("server-truststore.p12");
 
         System.out.println("Keystore URL: " + (keystoreUrl != null ? keystoreUrl.getPath() : "NOT FOUND"));
         System.out.println("Truststore URL: " + (truststoreUrl != null ? truststoreUrl.getPath() : "NOT FOUND"));
@@ -61,16 +61,15 @@ public class WebClientWiremockServer {
                         .keystorePath(keystoreFile.getPath())
                         .keystorePassword("changeit")
                         .keyManagerPassword("changeit")
-                        .keystoreType("JKS")
+                        .keystoreType("PKCS12")
                         .trustStorePath(truststoreFile.getPath())
                         .trustStorePassword("changeit")
-                        .trustStoreType("JKS")
+                        .trustStoreType("PKCS12")
                         .needClientAuth(true)
                         .extensions(transformer)
         );
 
         wireMockServer.stubFor(get(urlEqualTo("/"))
-
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
