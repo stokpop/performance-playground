@@ -1,15 +1,15 @@
 package nl.stokpop.httpclient;
 
 import nl.stokpop.kotlin.httpclient.HttpClientDefaultConfig;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.core5.util.Timeout;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -86,43 +86,44 @@ public class HttpClientExtravaganza {
             .build();
     }
 
-    public HttpClient createHttpClientSix() {
+    public org.apache.hc.client5.http.classic.HttpClient createHttpClientSix() {
         HttpComponentsClientHttpRequestFactory factory =
             new HttpComponentsClientHttpRequestFactory(); // good, with all three timeout calls
         factory.setConnectTimeout(250);
         factory.setConnectionRequestTimeout(350);
-        factory.setReadTimeout(4000);
+        // factory.setReadTimeout(4000); // is removed since Spring 6+?
 
         return factory.getHttpClient();
     }
 
-    public HttpClient createHttpClientSeven() {
+    public org.apache.hc.client5.http.classic.HttpClient createHttpClientSeven() {
         HttpComponentsClientHttpRequestFactory factory =
             new HttpComponentsClientHttpRequestFactory(); // bad, not all three timeout calls
-        factory.setReadTimeout(4000);
+        //factory.setReadTimeout(4000); // is removed since Spring 6+?
 
         return factory.getHttpClient();
     }
 
-    public HttpClient createHttpClientEight(HttpComponentsClientHttpRequestFactory factory) {
-        factory.setReadTimeout(4000); // bad, not all three timeout calls
+    public org.apache.hc.client5.http.classic.HttpClient createHttpClientEight(HttpComponentsClientHttpRequestFactory factory) {
+        //factory.setReadTimeout(4000); // bad, not all three timeout calls
         return factory.getHttpClient();
     }
 
     public RestTemplate test(final Integer maxConnections, final Integer maxConnectionsPerHost,
                              final Integer connectionTimeoutInMilliSeconds, final Integer readTimeoutInMilliSeconds, final SSLContext sslContext) {
 
-            PoolingHttpClientConnectionManager poolingHttpClientConnectionManager = sslContext != null ?
-                getPoolingHttpClientConnectionManagerWithSslEnabled(sslContext, maxConnections, maxConnectionsPerHost) :
-                getPoolingHttpClientConnectionManagerWithoutSslEnabled(maxConnections, maxConnectionsPerHost);
+            HttpClientConnectionManager poolingHttpClientConnectionManager = sslContext != null ?
+                getHttpClientConnectionManagerWithSslEnabled(sslContext, maxConnections, maxConnectionsPerHost) :
+                getHttpClientConnectionManagerWithoutSslEnabled(maxConnections, maxConnectionsPerHost);
 
-            RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(connectionTimeoutInMilliSeconds)
-                .setConnectionRequestTimeout(connectionTimeoutInMilliSeconds)
-                .setSocketTimeout(readTimeoutInMilliSeconds)
+            org.apache.hc.client5.http.config.RequestConfig requestConfig = org.apache.hc.client5.http.config.RequestConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(connectionTimeoutInMilliSeconds))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionTimeoutInMilliSeconds))
+                .setResponseTimeout(Timeout.ofMilliseconds(readTimeoutInMilliSeconds))
+                //.setSocketTimeout(readTimeoutInMilliSeconds)
                 .build();
 
-            HttpClient httpClient = HttpClients.custom()
+        org.apache.hc.client5.http.classic.HttpClient httpClient = org.apache.hc.client5.http.impl.classic.HttpClients.custom()
                 .setDefaultRequestConfig(requestConfig)
                 .setConnectionManager(poolingHttpClientConnectionManager)
                 .disableRedirectHandling()
@@ -138,23 +139,24 @@ public class HttpClientExtravaganza {
             }
         }
 
-    private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManagerWithoutSslEnabled(Integer maxConnections, Integer maxConnectionsPerHost) {
+    private HttpClientConnectionManager getHttpClientConnectionManagerWithoutSslEnabled(Integer maxConnections, Integer maxConnectionsPerHost) {
         return null;
     }
 
-    private PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManagerWithSslEnabled(SSLContext sslContext, Integer maxConnections, Integer maxConnectionsPerHost) {
+    private HttpClientConnectionManager getHttpClientConnectionManagerWithSslEnabled(SSLContext sslContext, Integer maxConnections, Integer maxConnectionsPerHost) {
         return null;
     }
 
     public HttpComponentsClientHttpRequestFactory bad3() {
 
-        RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectionRequestTimeout(350)
-            .setConnectTimeout(250)
-            .setSocketTimeout(100)
-            .build(); // bad, socketTimeout is missing, trigger is below on setHttpClient
+        org.apache.hc.client5.http.config.RequestConfig requestConfig = org.apache.hc.client5.http.config.RequestConfig.custom()
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(350))
+            .setConnectTimeout(Timeout.ofMilliseconds(250))
+            // .setResponseTimeout(Timeout.ofMilliseconds(4000))
+            // .setSocketTimeout(100) // changed into setResponseTimeout in HttpClient 5
+            .build(); // bad, setResponseTimeout is missing, trigger is below on setHttpClient
 
-        HttpClient client = HttpClientBuilder.create()
+        org.apache.hc.client5.http.impl.classic.CloseableHttpClient client = org.apache.hc.client5.http.impl.classic.HttpClientBuilder.create()
             .setDefaultRequestConfig(requestConfig)
             .build();
 

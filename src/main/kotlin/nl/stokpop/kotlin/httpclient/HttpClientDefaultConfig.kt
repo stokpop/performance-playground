@@ -18,7 +18,7 @@ class HttpClientDefaultConfig {
             .setMaxConnPerRoute(20)
             .setMaxConnTotal(20)
             .setDefaultRequestConfig(requestConfig)
-            .disableConnectionState()
+            //.disableConnectionState()
             .build()
     }
 

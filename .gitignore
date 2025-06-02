@@ -5,6 +5,7 @@ target/
 *.log
 *.jfr
 src/main/java/nl/stokpop/Foo.java
+src/main/kotlin/nl/stokpop/kotlin/Foo.kt
 /src/main/resources/*.jks
 /src/main/resources/*.p12
 /mtls-certs/generated-certs/
