@@ -21,6 +21,7 @@
         <java.version>17</java.version>
         <kotlin.version>2.1.0</kotlin.version>
         <jmh.version>1.36</jmh.version>
+        <pmd.version>7.14.0</pmd.version>
     </properties>
 
     <build>
@@ -96,6 +97,48 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>3.6.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.26.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.jpinpoint.sonar</groupId>
+                        <artifactId>sonar-pmd-jpinpoint</artifactId>
+                        <version>2.0.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-core</artifactId>
+                        <version>${pmd.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-java</artifactId>
+                        <version>${pmd.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <rulesets>
+                        <!-- The JPinpoint ruleset -->
+                        <ruleset>/com/jpinpoint/pmd/rules/jpinpoint-rules.xml</ruleset>
+                    </rulesets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate bugs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -250,9 +293,9 @@
             <version>4.1.5</version>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8-standalone</artifactId>
-            <version>3.0.1</version>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.9.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
