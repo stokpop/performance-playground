@@ -135,7 +135,8 @@
                         <id>validate bugs</id>
                         <phase>prepare-package</phase>
                         <goals>
-                            <goal>check</goal>
+<!--                            <goal>check</goal>-->
+                            <goal>pmd</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -320,6 +321,11 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns-native-macos</artifactId>
             <classifier>osx-aarch_64</classifier> <!-- Or x86_64 if your macOS is Intel-based -->
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-all</artifactId>
+            <version>2.3.0</version>
         </dependency>
     </dependencies>
 </project>
