@@ -1,5 +1,6 @@
 package nl.stokpop.jmh;
 
+import nl.stokpop.streams.EnumExists;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -32,6 +33,18 @@ public class LetsStream {
     @Benchmark
     public void plainStreamParallel(Blackhole blackhole) {
         blackhole.consume(numbers.parallelStream().reduce(0, Integer::sum));
+    }
+
+    @Benchmark
+    public void oneTwoThree(Blackhole blackhole) {
+        String value = "TWO";
+        blackhole.consume(EnumExists.OneTwoThree.isOneOfEnum(value));
+    }
+
+    @Benchmark
+    public void oneTwoThreeFast(Blackhole blackhole) {
+        String value = "TWO";
+        blackhole.consume(EnumExists.OneTwoThree.isOneOfEnumFast(value));
     }
 
     public static void main(String[] args) throws Exception {
