@@ -10,13 +10,13 @@ class HttpClientDefaultConfig {
 
         val requestConfig = RequestConfig.custom()
             .setConnectTimeout(200)
-            .setConnectionRequestTimeout(250)
+            //.setConnectionRequestTimeout(250)
             .setSocketTimeout(5000)
             .build()
 
         return HttpClients.custom()
-            .setMaxConnPerRoute(20)
-            .setMaxConnTotal(20)
+            //.setMaxConnPerRoute(20)
+            //.setMaxConnTotal(20)
             .setDefaultRequestConfig(requestConfig)
             //.disableConnectionState()
             .build()
